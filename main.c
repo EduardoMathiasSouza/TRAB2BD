@@ -63,9 +63,28 @@ int verifica_commits(struct Transacao *linha, int it, int qntd_de_transacao_ativ
     return 0;
 }
 
+int _menor_transa(struct Transacao *linha, int it, int inicio_transacao,int qntd_de_transacao_ativas){
+    int menor_transa = linha[inicio_transacao].t;
+    for(int i = inicio_transacao; i < it; i++)
+        if(linha[i].t < menor_transa)
+            menor_transa = linha[i].t;
+    return menor_transa;
+}
+
+int _maior_transa(struct Transacao *linha, int it, int inicio_transacao, int qntd_de_transacao_ativas){
+    int maior_transa = linha[inicio_transacao].t;
+    for(int i = inicio_transacao; i < it; i++)
+        if(linha[i].t > maior_transa)
+            maior_transa = linha[i].t; 
+    return maior_transa;
+}
+
 void monta_serialibilidade(struct Transacao *linha, int it, int inicio_transacao,int qntd_de_transacao_ativas){
-    int **M = (int **)aloca_matriz(qntd_de_transacao_ativas+1, qntd_de_transacao_ativas+1, sizeof(int));
-    zera_matriz(M,qntd_de_transacao_ativas, qntd_de_transacao_ativas);
+    int transacao_inicial = _menor_transa(linha, it, inicio_transacao,qntd_de_transacao_ativas);
+    int transacao_final = _maior_transa(linha, it, inicio_transacao, qntd_de_transacao_ativas);
+    printf("Menor: %d, Maior: %d\n", transacao_inicial, transacao_final);
+    int **M = (int **)aloca_matriz(transacao_final+1,transacao_final+1, sizeof(int));
+    zera_matriz(M,transacao_final+1, transacao_final+1);
     for(int i = inicio_transacao; i < it; i++){
         int transacao_atual = linha[i].t;
         char acao_atual = linha[i].acao;
@@ -86,8 +105,8 @@ void monta_serialibilidade(struct Transacao *linha, int it, int inicio_transacao
             }
         }
     }
-    for(int i = 1; i < qntd_de_transacao_ativas+1; i++){
-        for(int j = 1; j < qntd_de_transacao_ativas+1; j++){
+    for(int i = transacao_inicial; i < transacao_final+1; i++){
+        for(int j = transacao_inicial; j < transacao_final+1; j++){
             printf("%d  ", M[i][j]);
         }
         printf("\n");
