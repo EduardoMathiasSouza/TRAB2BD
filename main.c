@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "grafos.h"
 
 struct Transacao
 {
@@ -8,40 +9,6 @@ struct Transacao
     char variavel;
     int Commit;
 };
-
-void zera_matriz(int **m, const size_t n_linhas, const size_t n_colunas)
-{
-    for (size_t i = 0; i < n_linhas; i++)
-    {
-        for (size_t j = 0; j < n_colunas; j++)
-        {
-            m[i][j] = 0.0;
-        }
-    }
-}
-
-void **aloca_matriz(const size_t n_linhas, const size_t n_colunas, const size_t tam)
-{
-    void **matriz = malloc(n_linhas * sizeof(void *));
-    if (matriz == NULL)
-    {
-        return NULL;
-    }
-    for (size_t i = 0; i < n_linhas; i++)
-    {
-        matriz[i] = malloc(n_colunas * tam);
-        if (matriz[i] == NULL)
-        {
-            for (size_t j = 0; j < i; j++)
-            {
-                free(matriz[j]);
-            }
-            free(matriz);
-            return NULL;
-        }
-    }
-    return matriz;
-}
 
 void adiciona_linha(struct Transacao *linha,int it, int t, char acao, char variavel){
     printf("ITERACAO: %d\n", it);
@@ -83,34 +50,25 @@ void monta_serialibilidade(struct Transacao *linha, int it, int inicio_transacao
     int transacao_inicial = _menor_transa(linha, it, inicio_transacao,qntd_de_transacao_ativas);
     int transacao_final = _maior_transa(linha, it, inicio_transacao, qntd_de_transacao_ativas);
     printf("Menor: %d, Maior: %d\n", transacao_inicial, transacao_final);
-    int **M = (int **)aloca_matriz(transacao_final+1,transacao_final+1, sizeof(int));
-    zera_matriz(M,transacao_final+1, transacao_final+1);
+    struct Graph *Grafo = createAGraph(transacao_final+1);
     for(int i = inicio_transacao; i < it; i++){
         int transacao_atual = linha[i].t;
         char acao_atual = linha[i].acao;
         char variavel_atual = linha[i].variavel;
         for(int j = i  + 1; j < it; j++){
             if(acao_atual == 'R'){
-                if(linha[j].t != transacao_atual && linha[j].acao == 'W' && linha[j].variavel == variavel_atual){
-                    M[transacao_atual][linha[j].t] = 1;
-                }
+                if(linha[j].t != transacao_atual && linha[j].acao == 'W' && linha[j].variavel == variavel_atual)
+                    addEdge(Grafo,transacao_atual, linha[j].t);
             }
             if(acao_atual == 'W'){
-                if(linha[j].t != transacao_atual && linha[j].acao == 'W' && linha[j].variavel == variavel_atual){
-                    M[transacao_atual][linha[j].t] = 1;
-                }
-                if(linha[j].t != transacao_atual && linha[j].acao == 'R' && linha[j].variavel == variavel_atual){
-                    M[transacao_atual][linha[j].t] = 1;
-                }   
+                if(linha[j].t != transacao_atual && linha[j].acao == 'W' && linha[j].variavel == variavel_atual)
+                   addEdge(Grafo,transacao_atual, linha[j].t);
+                if(linha[j].t != transacao_atual && linha[j].acao == 'R' && linha[j].variavel == variavel_atual)
+                   addEdge(Grafo,transacao_atual, linha[j].t);
             }
         }
     }
-    for(int i = transacao_inicial; i < transacao_final+1; i++){
-        for(int j = transacao_inicial; j < transacao_final+1; j++){
-            printf("%d  ", M[i][j]);
-        }
-        printf("\n");
-    }
+    printGraph(Grafo);
 }
 
 int main(){
