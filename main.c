@@ -190,6 +190,6 @@ int main(){
                 qntd_de_transacao_ativas = 0;
             }
         }
-        printf("%d %d %c %c\n", it, linha[it].t, linha[it].acao, linha[it].variavel);
+        //printf("%d %d %c %c\n", it, linha[it].t, linha[it].acao, linha[it].variavel);
     };
 }
