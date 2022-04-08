@@ -15,11 +15,11 @@ struct Graph* criaGrafo(int vertices) {
   struct Graph* graph = malloc(sizeof(struct Graph));
   graph->numVertices = vertices;
 
-  graph->adjLists = malloc(vertices * sizeof(struct node*));
+  graph->adjLists = malloc(vertices * sizeof(struct node*));//Aloca lista de adjacencia
 
   int i;
   for (i = 0; i < vertices; i++)
-    graph->adjLists[i] = NULL;
+    graph->adjLists[i] = NULL;//Inicializa lista de adjacencia com NULL
 
   return graph;
 }

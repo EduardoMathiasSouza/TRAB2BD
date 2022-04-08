@@ -4,12 +4,13 @@
 
 struct Transacao
 {
-    int t;
-    char acao;
-    char variavel;
-    int Commit;
+    int t; //ID da transacao(1,2,3,...,n)
+    char acao;//R,W,C
+    char variavel;//X,Y,Z,....,-
+    int Commit;//1 se acao for um commit, 0 se nao for
 };
 
+//Adiciona informacoes na lista de transacoes (Lista de transacoes contem structs Transacao)
 void adiciona_linha(struct Transacao *linha,int it, int t, char acao, char variavel){
     linha[it].t = t;
     linha[it].acao = acao;
@@ -19,6 +20,7 @@ void adiciona_linha(struct Transacao *linha,int it, int t, char acao, char varia
         linha[it].Commit = 1;}
 }
 
+//Verifica se todas transacoes ativas foram commitadas
 int verifica_commits(struct Transacao *linha, int it, int qntd_de_transacao_ativas){
     int commits = 1;
     for(int i = it-1; i > 1; i--)
@@ -29,6 +31,7 @@ int verifica_commits(struct Transacao *linha, int it, int qntd_de_transacao_ativ
     return 0;
 }
 
+//Encontra menor numeral de transacao (mais antiga)
 int _menor_transa(struct Transacao *linha, int it, int inicio_transacao,int qntd_de_transacao_ativas){
     int menor_transa = linha[inicio_transacao].t;
     for(int i = inicio_transacao; i < it; i++)
@@ -37,6 +40,7 @@ int _menor_transa(struct Transacao *linha, int it, int inicio_transacao,int qntd
     return menor_transa;
 }
 
+//Encontra maior numeral de transacao (mais recente)
 int _maior_transa(struct Transacao *linha, int it, int inicio_transacao, int qntd_de_transacao_ativas){
     int maior_transa = linha[inicio_transacao].t;
     for(int i = inicio_transacao; i < it; i++)
