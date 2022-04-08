@@ -54,11 +54,11 @@ int testa_ciclo(struct Graph* Grafo, int v, int visitou[], int *path)
         struct node* temp = Grafo->adjLists[v];
         while (temp)
         {
-            if (visitou[temp->vertex] == -1 && testa_ciclo(Grafo, temp->vertex, visitou, path))
+            if (visitou[temp->vertice] == -1 && testa_ciclo(Grafo, temp->vertice, visitou, path))
                 return 1;
-            else if (path[temp->vertex])
+            else if (path[temp->vertice])
                 return 1;
-            temp = temp->next;
+            temp = temp->prox;
         }
     }
     path[v] = 0;
@@ -90,7 +90,7 @@ void imprime_transacoes(int transacao_inicial,int transacao_final){
 void monta_serialibilidade(struct Transacao *linha, int it, int inicio_transacao,int qntd_de_transacao_ativas){
     int transacao_inicial = _menor_transa(linha, it, inicio_transacao,qntd_de_transacao_ativas);
     int transacao_final = _maior_transa(linha, it, inicio_transacao, qntd_de_transacao_ativas);
-    struct Graph *Grafo = createAGraph(transacao_final+1);
+    struct Graph *Grafo = criaGrafo(transacao_final+1);
     for(int i = inicio_transacao; i < it; i++){
         int transacao_atual = linha[i].t;
         char acao_atual = linha[i].acao;
@@ -98,13 +98,13 @@ void monta_serialibilidade(struct Transacao *linha, int it, int inicio_transacao
         for(int j = i  + 1; j < it; j++){
             if(acao_atual == 'R'){
                 if(linha[j].t != transacao_atual && linha[j].acao == 'W' && linha[j].variavel == variavel_atual)
-                    addEdge(Grafo,transacao_atual, linha[j].t);
+                    adicionaAresta(Grafo,transacao_atual, linha[j].t);
             }
             if(acao_atual == 'W'){
                 if(linha[j].t != transacao_atual && linha[j].acao == 'W' && linha[j].variavel == variavel_atual)
-                   addEdge(Grafo,transacao_atual, linha[j].t);
+                   adicionaAresta(Grafo,transacao_atual, linha[j].t);
                 if(linha[j].t != transacao_atual && linha[j].acao == 'R' && linha[j].variavel == variavel_atual)
-                   addEdge(Grafo,transacao_atual, linha[j].t);
+                   adicionaAresta(Grafo,transacao_atual, linha[j].t);
             }
         }
     }

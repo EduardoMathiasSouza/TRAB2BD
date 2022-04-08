@@ -2,16 +2,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Create a node
-struct node* createNode(int v) {
-  struct node* newNode = malloc(sizeof(struct node));
-  newNode->vertex = v;
-  newNode->next = NULL;
-  return newNode;
+//Cria um nodo
+struct node* criaNodo(int v) {
+  struct node* novoNodo = malloc(sizeof(struct node));
+  novoNodo->vertice = v;
+  novoNodo->prox = NULL;
+  return novoNodo;
 }
 
-// Create a graph
-struct Graph* createAGraph(int vertices) {
+//Cria o grafo
+struct Graph* criaGrafo(int vertices) {
   struct Graph* graph = malloc(sizeof(struct Graph));
   graph->numVertices = vertices;
 
@@ -24,25 +24,25 @@ struct Graph* createAGraph(int vertices) {
   return graph;
 }
 
-// Add edge
-void addEdge(struct Graph* graph, int s, int d) {
-    for(struct node *atual = graph->adjLists[s]; atual != NULL; atual = atual->next)
-        if(atual->vertex == d) 
+//Adiciona Aresta (caso não exista repetida)
+void adicionaAresta(struct Graph* graph, int s, int d) {
+    for(struct node *atual = graph->adjLists[s]; atual != NULL; atual = atual->prox)
+        if(atual->vertice == d) 
             return;
-    struct node* newNode = createNode(d);
-    newNode->next = graph->adjLists[s];
-    graph->adjLists[s] = newNode;
+    struct node* novoNodo = criaNodo(d);
+    novoNodo->prox = graph->adjLists[s];
+    graph->adjLists[s] = novoNodo;
 }
 
-// Print the graph
+//Imprime o Grafo
 void printGraph(struct Graph* graph) {
   int v;
   for (v = 0; v < graph->numVertices; v++) {
     struct node* temp = graph->adjLists[v];
-    printf("\n Vertex %d\n: ", v);
+    printf("\n vertice %d\n: ", v);
     while (temp) {
-      printf("%d -> ", temp->vertex);
-      temp = temp->next;
+      printf("%d -> ", temp->vertice);
+      temp = temp->prox;
     }
     printf("\n");
   }
