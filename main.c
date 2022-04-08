@@ -71,6 +71,60 @@ void monta_serialibilidade(struct Transacao *linha, int it, int inicio_transacao
     printGraph(Grafo);
 }
 
+int conta_variaveis(struct Transacao *linha, int it, int inicio_transacao, char *variaveis){
+    int j = 0;
+    variaveis[j] = linha[inicio_transacao].variavel;
+    for(int i=inicio_transacao; i < it; i++)
+    {
+        int achou = 0;
+        if(linha[i].variavel != '-'){
+            for(int k=0; k< it; k++){
+                if(variaveis[k] == linha[i].variavel)
+                    achou = 1;
+                }
+            if(!achou){
+                j++;
+                variaveis[j] = linha[i].variavel;
+                } 
+        }
+    }
+    return j;
+}
+
+int acha_ultimo_write(struct Transacao *linha, int it, int inicio_transacao,char variavel_atual){
+    for(int i = it; i > inicio_transacao; i--){
+        if(linha[i].variavel == variavel_atual && linha[i].acao == 'W')
+            return i;
+    }
+    return inicio_transacao;
+}
+
+int monta_visao(struct Transacao *linha, int it, int inicio_transacao,char variavel_atual){
+    int serializavel = 1;
+    char *variaveis = (char *) malloc (sizeof(char) *it);
+    int n_variaveis = conta_variaveis(linha,it,inicio_transacao,variaveis) + 1;
+    printf("NUM VARIAVEIS:%d\n", n_variaveis);
+    for(int i = 0; i < n_variaveis; i++){
+        int pos_atual = acha_ultimo_write(linha, it, inicio_transacao,variaveis[i]);
+        printf("POS_ATUAL:%d\n", pos_atual);
+        printf("VARIAVEL ATUAL: %c\n", variaveis[i]);
+        for(int j = pos_atual; j > inicio_transacao - 1; j--){
+            int tipo_atual = linha[pos_atual].t;
+            printf("TIPO_ATUAL:%d\n", tipo_atual);
+            if(linha[j].acao == 'R' && linha[j].t == tipo_atual && linha[j].variavel == variaveis[i]){
+                printf("ENTREI");
+                for(int k = j+1; k < pos_atual; k++){
+                    if(linha[k].t != linha[j].t && linha[k].acao == 'W' && linha[k].variavel == variaveis[i]){
+                        serializavel = 0;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    return serializavel;
+}
+
 int main(){
     struct Transacao *linha = (struct Transacao *) malloc(5000 * sizeof(struct Transacao));
     int it;
@@ -87,8 +141,11 @@ int main(){
         if(acao == 'C'){
             if(verifica_commits(linha,it, qntd_de_transacao_ativas)){
                 monta_serialibilidade(linha, it, inicio_transacao, qntd_de_transacao_ativas);
-                //monta_igual();
-                inicio_transacao = it;
+                if (monta_visao(linha, it, inicio_transacao, qntd_de_transacao_ativas))
+                    fprintf(stdout," SV\n");
+                else
+                    fprintf(stdout, " NV\n");
+                inicio_transacao = it+1;
                 qntd_de_transacao_ativas = 0;
             }
         }
