@@ -88,6 +88,8 @@ int detecta_ciclo(struct Graph *Grafo, int V)
 }
 
 void imprime_transacoes(int transacao_inicial,int transacao_final){
+    if(transacao_inicial == 0)
+        transacao_inicial = transacao_inicial+1;
     for(int i = transacao_inicial; i < transacao_final; i++)
         fprintf(stdout, "%d,", i);
     fprintf(stdout, "%d ", transacao_final);
