@@ -166,7 +166,7 @@ int monta_visao(struct Transacao *linha, int it, int inicio_transacao, int qntd_
                     }
                 }
             }
-            if(linha[j].acao == 'R' && linha[j].t != tipo_atual && linha[j].variavel == variaveis[i]){
+            if(linha[j].acao == 'R' && linha[j].t != tipo_atual && linha[j].variavel == variaveis[i]){//Se existe qualquer t (sem ser o T atual) que realize um read da variavel em questao antes do Write do T atual
                 adicionaAresta(GrafoVisao,tipo_atual,linha[j].t); //Indica que o tipo atual deve vir depois do tipo que esta sendo analisado 
             }
         }
