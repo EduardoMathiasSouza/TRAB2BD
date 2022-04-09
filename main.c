@@ -149,8 +149,9 @@ int acha_ultimo_write(struct Transacao *linha, int it, int inicio_transacao,char
     return inicio_transacao;
 }
 
-int monta_visao(struct Transacao *linha, int it, int inicio_transacao,char variavel_atual){
+int monta_visao(struct Transacao *linha, int it, int inicio_transacao, int qntd_de_transacao_ativas){
     int igualavel = 1;
+    struct Graph *GrafoVisao = criaGrafo(_maior_transa(linha,it,inicio_transacao,qntd_de_transacao_ativas)+1);//Cria grafo 
     char *variaveis = (char *) malloc (sizeof(char) *it); //aloca um vetor de char para variaveis
     int n_variaveis = conta_variaveis(linha,it,inicio_transacao,variaveis) + 1; //conta as variaveis e adiciona ao vetor
     for(int i = 0; i < n_variaveis; i++){
@@ -165,8 +166,13 @@ int monta_visao(struct Transacao *linha, int it, int inicio_transacao,char varia
                     }
                 }
             }
+            if(linha[j].acao == 'R' && linha[j].t != tipo_atual && linha[j].variavel == variaveis[i]){
+                adicionaAresta(GrafoVisao,tipo_atual,linha[j].t); //Indica que o tipo atual deve vir depois do tipo que esta sendo analisado 
+            }
         }
     }
+    if(detecta_ciclo(GrafoVisao, GrafoVisao->numVertices))
+        igualavel = 0;
     return igualavel;//Caso contrario, eh igualavel
 }
 
